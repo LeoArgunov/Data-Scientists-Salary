@@ -1,0 +1,100 @@
+from ydata_profiling import ProfileReport
+import seaborn as sns
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+
+pd.set_option('display.max_columns', 100)
+pd.set_option('display.max_rows', 100)
+df = pd.read_csv("ds_salaries.csv")
+
+# пропусков не обнаружено
+print(df.isnull().sum())
+
+# удаление дубликатов
+df = df.drop_duplicates().reset_index(drop=True)
+df.duplicated().sum()
+df.info()
+df.work_year.value_counts()
+df.experience_level.value_counts()
+df.company_location.value_counts()
+df.employment_type.value_counts()
+df.job_title.value_counts()
+df.remote_ratio.value_counts()
+
+pivot = df.pivot_table(index=['experience_level'],
+                       values=['salary_in_usd'],
+                       aggfunc=['mean', 'median'])
+
+
+pivot.plot(kind='barh', color=('orange', 'green'))
+plt.xlabel('Зарплата в долларах (год)')
+plt.ylabel('Уровень опыта')
+plt.title('Сравнение зарплат по уровням опыта')
+plt.legend(['Среднее', 'Медиана'], loc="lower right")
+plt.show()
+
+sns.boxplot(x="experience_level", y="salary_in_usd", data=df, order=['EX', 'SE', 'MI', 'EN'])
+plt.title('Распределения зарплат по уровням опыта')
+plt.show()
+
+pivot = df.pivot_table(index=['remote_ratio'],
+                       values=['salary_in_usd'],
+                       aggfunc=['mean', 'median'])
+
+
+pivot.plot(kind='bar')
+plt.xlabel('Объем удаленной работы')
+plt.ylabel('Зарплата в долларах (год)')
+plt.title('Сравнение зарплат по объему удаленной работы')
+plt.legend(['Среднее', 'Медиана'])
+plt.show()
+
+pivot = df.pivot_table(index=['employment_type'], values=['salary_in_usd'], aggfunc=['mean', 'median'])
+
+pivot.plot(kind='barh', color=('orange', 'green')) plt.xlabel('Зарплата в долларах (год)') plt.ylabel('Тип занятости') plt.title('Сравнение зарплат по типам занятости') plt.legend(['Среднее', 'Медиана']) plt.show()
+
+
+sns.boxplot(x="employment_type", y="salary_in_usd", data=df, order=['FT', 'CT', 'FL', 'PT'])
+plt.title('Распределения зарплат по типам занятости')
+plt.show()
+
+pivot = df.pivot_table(index=['company_size'],
+                       values=['salary_in_usd'],
+                       aggfunc=['mean', 'median'])
+
+
+pivot.plot(kind='barh', color=('orange', 'green'))
+plt.xlabel('Зарплата в долларах (год)')
+plt.ylabel('Количество работавших людей в компании')
+plt.title('Сравнение зарплат по количеству людей в компании')
+plt.legend(['Среднее', 'Медиана'])
+plt.show()
+
+sns.boxplot(x="company_size", y="salary_in_usd", data=df, order=['L', 'M', 'S'])
+plt.title('Распределения зарплат по количеству людей в компании')
+plt.show()
+
+top_company_location = df.groupby('company_location')['salary_in_usd'].mean().nlargest(10).index
+df_top = df[df.company_location.isin(top_company_location)]
+
+
+sns.barplot(x='salary_in_usd', y='company_location', data=df_top, order=top_company_location)
+plt.xlabel('Зарплата в долларах (год)')
+plt.ylabel('Страна компании')
+plt.title('Сравнение зарплат в различных странах')
+plt.show()
+
+top_employee_residence = df.groupby('employee_residence')['salary_in_usd'].mean().nlargest(10).index
+df_top = df[df.employee_residence.isin(top_employee_residence)]
+
+
+sns.barplot(x='salary_in_usd', y='employee_residence', data=df_top, order=top_employee_residence)
+plt.xlabel('Зарплата в долларах (год)')
+plt.ylabel('Страна проживания')
+plt.title('Сравнение зарплат сотрудников, проживающих в разных странах')
+plt.show()
+
+profile = ProfileReport(df)
+profile.to_file("df_report.html")
