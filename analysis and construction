@@ -51,9 +51,18 @@ plt.title('Сравнение зарплат по объему удаленно�
 plt.legend(['Среднее', 'Медиана'])
 plt.show()
 
-pivot = df.pivot_table(index=['employment_type'], values=['salary_in_usd'], aggfunc=['mean', 'median'])
 
-pivot.plot(kind='barh', color=('orange', 'green')) plt.xlabel('Зарплата в долларах (год)') plt.ylabel('Тип занятости') plt.title('Сравнение зарплат по типам занятости') plt.legend(['Среднее', 'Медиана']) plt.show()
+pivot = df.pivot_table(index=['employment_type'],
+                       values=['salary_in_usd'],
+                       aggfunc=['mean', 'median'])
+
+
+pivot.plot(kind='barh', color=('orange', 'green'))
+plt.xlabel('Зарплата в долларах (год)')
+plt.ylabel('Тип занятости')
+plt.title('Сравнение зарплат по типам занятости')
+plt.legend(['Среднее', 'Медиана'])
+plt.show()
 
 
 sns.boxplot(x="employment_type", y="salary_in_usd", data=df, order=['FT', 'CT', 'FL', 'PT'])
